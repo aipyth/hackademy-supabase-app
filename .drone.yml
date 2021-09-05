@@ -18,8 +18,8 @@ steps:
 
   commands:
     - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD
-    - docker build . -t "{DRONE_COMMIT:0:7 }"
+    - docker build . -t ${DRONE_COMMIT:0:7}
 
 trigger:
   branch:
-    - master
+    - dev

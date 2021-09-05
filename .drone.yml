@@ -1,5 +1,6 @@
 kind: pipeline
 name: "Push on dev"
+name: docker
 
 steps:
 
@@ -7,8 +8,11 @@ steps:
   image: node:16
   commands:
   - npm install
-  - npm test
+- name: "Build docker image"
+  image: plugins/docker
+  command:
+    - docker build . -t "{DRONE_COMMIT:0:7 }"
 
 trigger:
-  event:
-    - push
+  branch:
+    - dev

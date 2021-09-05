@@ -1,4 +1,4 @@
-kind: pipeline
+kind: "pipeline"
 name: "Push on dev"
   steps:
     - name: "Verify & Build"

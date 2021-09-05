@@ -1,0 +1,81 @@
+import { useState } from "react"
+import Layout from "../containers/Layout"
+import { supabase } from '../utils'
+import '../styles/Home.module.sass'
+import { Input, Button } from '@supabase/ui'
+import LogOutButton from '../containers/LogOutButton'
+
+export default function KYC({ profile }) {
+    const [phone, setPhone] = useState(profile?.phone || '')
+    const [first_name, setFirstname] = useState(profile?.first_name || '')
+    const [last_name, setLastname] = useState(profile?.last_name || '')
+    const [country, setCountry] = useState(profile?.country || '')
+    const [city, setCity] = useState(profile?.city || '')
+
+    const saveData = async () => {
+        const data = {
+            phone,
+            first_name,
+            last_name,
+            country,
+            city,
+        }
+        const { user } = supabase.auth.session()
+        const { error } = await supabase
+            .from('profiles')
+            .update(data)
+            .match({ id: user.id })
+        if (error) {
+            console.error(error)
+        }
+    }
+
+    return (
+        <Layout>
+            <form className="kyc-form">
+                <Input label="Phone" value={phone} onChange={e => setPhone(e.target.value)} />
+                <Input label="First name" value={first_name} onChange={e => setFirstname(e.target.value)} />
+                <Input label="Last name" value={last_name} onChange={e => setLastname(e.target.value)} />
+                <Input label="Country" value={country} onChange={e => setCountry(e.target.value)} />
+                <Input label="City" value={city} onChange={e => setCity(e.target.value)} />
+            </form>
+            <Button block type="primary"
+                    onClick={() => saveData()}
+            >
+                Save
+            </Button>
+            <LogOutButton redirect_to="/auth" />
+        </Layout>
+    )
+}
+
+export async function getServerSideProps(context) {
+    const { user } = await supabase.auth.api.getUserByCookie(context.req)
+    if (!user) {
+        return {
+            redirect: {
+                destination: '/auth',
+                premanent: false,
+            }
+        }
+    }
+
+    const { data } = await supabase
+        .from('profiles')
+        .select()
+        .match({id: user.id})
+        .single()
+    if (Object.keys(data).length === 0) {
+        await supabase
+            .from('profiles')
+            .insert([
+                { id: user.id },
+            ])
+    }
+
+    return {
+        props: {
+            profile: data || null,
+        }
+    }
+}

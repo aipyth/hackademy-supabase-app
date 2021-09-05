@@ -1,0 +1,14 @@
+kind: pipeline
+name: "Push on dev"
+
+steps:
+
+- name: "Verify & Build"
+  image: node:16
+  commands:
+  - npm install
+  - npm test
+
+trigger:
+  event:
+    - push

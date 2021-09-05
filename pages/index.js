@@ -84,9 +84,8 @@ export async function getServerSideProps(context) {
         }
     }
 
-    let profile = await getUserProfile({ user_id: user.id })
-    profile.doc_url = await docs.getDocUrl(profile.doc_url) || null
-    console.log(profile)
+    const profile = await getUserProfile({ user_id: user.id })
+    console.log('profile', profile)
 
     return {
         props: {

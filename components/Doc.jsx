@@ -1,9 +1,14 @@
 import { Card } from '@supabase/ui'
 import { supabase, docs } from '../utils'
-import {useState} from 'react'
+import { useEffect, useState } from 'react'
 
-export default function Doc({ doc_url }) {
-    const [docUrl, setDocUrl] = useState(doc_url)
+export default async function Doc({ doc_url }) {
+    console.log('doc_url', doc_url)
+    const docPath = await docs.getDocUrl(doc_url)
+    console.log('docPath', docPath)
+    const [docUrl, setDocUrl] = useState(docPath)
+
+    console.log('docUrl', docUrl, doc_url, docPath)
 
     const saveDoc = async (e) => {
         const docFile = e.target.files[0]
@@ -14,21 +19,16 @@ export default function Doc({ doc_url }) {
         await docs.saveDocPath({ doc_path: new_doc_path, user_id: user.id})
 
         const new_doc_url = await docs.getDocUrl(new_doc_path)
+        console.log("new_doc_url", new_doc_url)
         if (new_doc_url) {
-            setDocUrl(signedUrl)
+            setDocUrl(new_doc_url)
         }
     }
 
     return (
-        <Card title="Document"
-              cover={
-                <img key="" src={docUrl}
-                />
-              }
-        >
+        <>
+            <Image src={docUrl} alt="Document picture"></Image>
             <input id="doc-file" type="file" name="doc-file" accept="image/jpg" onChange={(e) => saveDoc(e)}/>
-
-        </Card>
-
+        </>
     )
 }

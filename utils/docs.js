@@ -38,12 +38,12 @@ export default {
             .from('docs')
             .createSignedUrl(doc_path, DOC_URL_EXPIRE)
         console.log('p',p)
-        // if (error) {
-        //     console.error('error getting user doc', error)
-        // } else {
-        //     console.log('signedUrl', signedUrl)
-        //     return signedUrl
-        // }
+        if (p.error) {
+            console.error('error getting user doc', p.error)
+        } else {
+            console.log('signedUrl', p.signedURL)
+            return p.signedURL
+        }
     },
     async saveDocPath({ doc_path, user_id }) {
         console.log(user_id, doc_path)

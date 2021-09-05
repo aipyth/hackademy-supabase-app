@@ -1,9 +1,10 @@
 import { useState } from "react"
 import Layout from "../containers/Layout"
-import { supabase } from '../utils'
+import { supabase, docs } from '../utils'
 import '../styles/Home.module.sass'
-import { Input, Button } from '@supabase/ui'
+import { Input, Button, Card } from '@supabase/ui'
 import LogOutButton from '../containers/LogOutButton'
+import Doc from "../components/Doc"
 
 export default function KYC({ profile }) {
     const [phone, setPhone] = useState(profile?.phone || '')
@@ -38,6 +39,7 @@ export default function KYC({ profile }) {
                 <Input label="Last name" value={last_name} onChange={e => setLastname(e.target.value)} />
                 <Input label="Country" value={country} onChange={e => setCountry(e.target.value)} />
                 <Input label="City" value={city} onChange={e => setCity(e.target.value)} />
+                <Doc doc_url={ profile?.doc_url } />
             </form>
             <Button block type="primary"
                     onClick={() => saveData()}
@@ -47,6 +49,28 @@ export default function KYC({ profile }) {
             <LogOutButton redirect_to="/auth" />
         </Layout>
     )
+}
+
+async function getUserProfile({ user_id }) {
+    const { data: profile, error } = await supabase
+        .from('profiles')
+        .select()
+        .match({id: user_id})
+        .single()
+    if (error) {
+        console.error(error)
+    }
+    if (Object.keys(profile).length === 0) {
+        const { error } = await supabase
+            .from('profiles')
+            .insert([
+                { id: user.id },
+            ])
+        if (error) {
+            console.error(error)
+        }
+    }
+    return profile
 }
 
 export async function getServerSideProps(context) {
@@ -60,22 +84,14 @@ export async function getServerSideProps(context) {
         }
     }
 
-    const { data } = await supabase
-        .from('profiles')
-        .select()
-        .match({id: user.id})
-        .single()
-    if (Object.keys(data).length === 0) {
-        await supabase
-            .from('profiles')
-            .insert([
-                { id: user.id },
-            ])
-    }
+    let profile = await getUserProfile({ user_id: user.id })
+    profile.doc_url = await docs.getDocUrl(profile.doc_url) || null
+    console.log(profile)
 
     return {
         props: {
-            profile: data || null,
+            profile: profile || null,
         }
     }
 }
+

@@ -1,3 +1,4 @@
 import supabase from './supabase'
+import docs from './docs'
 
-export { supabase }
+export { supabase, docs }

@@ -14,10 +14,10 @@ steps:
     REGISTRY_USERNAME:
       from_secret: rergistry_username
     REGISTRY_PASSWORD:
-      from_secret: registry_password.
+      from_secret: registry_password
 
   commands:
-    - docker login -u $REGISTRY_USERNAME $REGISTRY_PASSWORD
+    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD
     - docker build . -t "{DRONE_COMMIT:0:7 }"
 
 trigger:

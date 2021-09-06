@@ -31,6 +31,8 @@ export default function KYC({ profile }) {
         }
     }
 
+    console.log('profile doc', profile.doc_url)
+
     return (
         <Layout>
             <form className="kyc-form">
@@ -61,7 +63,7 @@ async function getUserProfile({ user_id }) {
         console.error(error)
     }
     if (Object.keys(profile).length === 0) {
-        const { error } = await supabase
+        const { data: profile, error } = await supabase
             .from('profiles')
             .insert([
                 { id: user.id },
@@ -69,6 +71,7 @@ async function getUserProfile({ user_id }) {
         if (error) {
             console.error(error)
         }
+        return profile
     }
     return profile
 }
@@ -85,7 +88,6 @@ export async function getServerSideProps(context) {
     }
 
     const profile = await getUserProfile({ user_id: user.id })
-    console.log('profile', profile)
 
     return {
         props: {

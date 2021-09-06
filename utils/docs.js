@@ -1,14 +1,12 @@
 import supabase from './supabase'
 
-const DOC_URL_EXPIRE = 60
-
 function makeDocPath(user_id) {
-
+    return `private/${user_id}.jpg`
 }
 
 export default {
     async updateUserDoc({ file, user_id }) {
-        const doc_path = `private/${user_id}.jpg`
+        const doc_path = makeDocPath(user_id)
         const { data, error } = await supabase
             .storage
             .from('docs')
@@ -20,7 +18,7 @@ export default {
         return { data, doc_path }
     },
     async uploadUserDoc({ file, user_id }) {
-        const doc_path = `private/${user_id}.jpg`
+        const doc_path = makeDocPath(user_id)
         const { data, error } = await supabase
             .storage
             .from('docs')
@@ -30,20 +28,6 @@ export default {
             console.error('error uploading user doc', error)
         }
         return { data, doc_path }
-    },
-    async getDocUrl(doc_path) {
-        console.log('GetDocUrl input', doc_path)
-        const p = await supabase
-            .storage
-            .from('docs')
-            .createSignedUrl(doc_path, DOC_URL_EXPIRE)
-        console.log('p',p)
-        if (p.error) {
-            console.error('error getting user doc', p.error)
-        } else {
-            console.log('signedUrl', p.signedURL)
-            return p.signedURL
-        }
     },
     async saveDocPath({ doc_path, user_id }) {
         console.log(user_id, doc_path)

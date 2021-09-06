@@ -1,26 +1,28 @@
-kind: "pipeline"
+kind: pipeline
+type: docker
 name: "Push on dev"
-  steps:
-    - name: "Verify & Build"
-      image: node:16
-      commands:
-        - yarn install
-        - yarn build
 
-    - name: "Build docker image"
-      image: plugins/docker
-      environment:
-        NEXT_PUBLIC_SUPABASE_APP_URL: https://pndfgbnxitpxoofuyrlo.supabase.co
-        NEXT_PUBLIC_SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzMDYwMzgzOSwiZXhwIjoxOTQ2MTc5ODM5fQ.5EntK-sXJgcRMsrkKr_TVHpn6VQiYRJPryivRQ7sVWI
-        REGISTRY_USERNAME:
-          from_secret: rergistry_username
-        REGISTRY_PASSWORD:
-          from_secret: registry_password
-
+steps:
+- name: "Verify & Build"
+  image: node:16
   commands:
-    - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD
-    - docker build . -t ${REGISTRY_USERNAME}i/hackademy-supabase-app:${DRONE_COMMIT:0:7}
+  - yarn install
+  - yarn build
+
+- name: "Build docker image"
+  image: plugins/docker
+  environment:
+    NEXT_PUBLIC_SUPABASE_APP_URL: https://pndfgbnxitpxoofuyrlo.supabase.co
+    NEXT_PUBLIC_SUPABASE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlhdCI6MTYzMDYwMzgzOSwiZXhwIjoxOTQ2MTc5ODM5fQ.5EntK-sXJgcRMsrkKr_TVHpn6VQiYRJPryivRQ7sVWI
+    REGISTRY_USERNAME:
+      from_secret: rergistry_username
+    REGISTRY_PASSWORD:
+      from_secret: registry_password
+  commands:
+  - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD
+  - docker build . -t ${REGISTRY_USERNAME}i/hackademy-supabase-app:${DRONE_COMMIT:0:7}
 
 trigger:
   branch:
-    - dev
+    exclude:
+    - master

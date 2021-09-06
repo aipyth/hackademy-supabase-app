@@ -20,7 +20,7 @@ steps:
       from_secret: registry_password
   commands:
   - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD
-  - docker build . -t ${REGISTRY_USERNAME}i/hackademy-supabase-app:${DRONE_COMMIT:0:7}
+  - docker build . -t ${REGISTRY_USERNAME}/hackademy-supabase-app:${DRONE_COMMIT:0:7}
 
 trigger:
   branch:

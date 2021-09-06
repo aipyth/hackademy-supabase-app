@@ -19,7 +19,7 @@ steps:
     REGISTRY_PASSWORD:
       from_secret: registry_password
   commands:
-  - echo $REGISTRY_USERNAME $REGISTRY_PASSWORD
+  - echo "$REGISTRY_USERNAME $REGISTRY_PASSWORD"
   - docker login -u $REGISTRY_USERNAME -p $REGISTRY_PASSWORD
   - docker build . -t ${REGISTRY_USERNAME}/hackademy-supabase-app:${DRONE_COMMIT:0:7}
 
